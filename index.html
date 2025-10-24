@@ -1,0 +1,1573 @@
+<!DOCTYPE html>
+<html class="dark" lang="es">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Iglesia Casa de Refugio / Radio "Ha Resucitado"</title>
+
+    <link crossorigin="" href="https://fonts.gstatic.com/" rel="preconnect" />
+    <link as="style"
+        href="https://fonts.googleapis.com/css2?display=swap&family=Inter:wght@400;500;700;900"
+        onload="this.rel='stylesheet'" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    
+    <style type="text/tailwindcss">
+        :root {
+            /* COLORES BASADOS EN VERDE CLARO (PRIMARIO) */
+            --primary-color: #4CAF50; /* Verde Claro/Brillante (para bordes, botones, enlaces principales) */
+            --secondary-color: #81C784; /* Verde más claro o complementario (para énfasis secundario) */
+            --background-dark: #1A1A1A; /* Gris muy Oscuro para el fondo principal */
+            --background-light: #2C2C2C; /* Gris intermedio para tarjetas y navbar */
+            --text-light: #f0f0f0; /* Texto casi blanco */
+            --text-dark: #B0B0B0; /* Texto gris claro para descripciones */
+            --purple-welcome: #800080; /* Púrpura (Mantenido solo por si acaso, pero no usado en el botón) */
+            /* COLORES PARA EL BOTÓN 'SOY NUEVO' (AZUL) */
+            --welcome-btn-color: #1E88E5; /* Azul Profundo */
+            --welcome-btn-hover: #42A5F5; /* Azul Brillante para Hover */
+        }
+        
+        #video-background {
+            object-fit: cover;
+            z-index: -1;
+            filter: brightness(0.9);
+        }
+
+        /* Estilo para la barra de navegación FIJA */
+        .fixed-navbar {
+            position: fixed; 
+            top: 0;
+            left: 0;
+            width: 100%; 
+            z-index: 50; 
+            backdrop-filter: blur(8px);
+            background-color: var(--background-light); 
+        }
+        
+        /* Estilos específicos para el mapa de misiones */
+        .map-wrapper {
+            position: relative;
+            width: 100%;
+            padding-top: 58.95%; 
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Estilo para la imagen dentro del wrapper */
+        .map-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 0.75rem;
+        }
+
+        .map-pin {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+
+        /* PIN NEGRO */
+        .pin-default {
+            background-color: #000000;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .pin-hover-state {
+            background-color: var(--secondary-color);
+            transform: scale(1.5);
+            z-index: 11;
+        }
+
+        /* CORRECCIÓN DE LEGIBILIDAD DEL TOOLTIP DE MISIONES */
+        .pin-tooltip {
+            position: absolute;
+            top: 50%; 
+            left: 100%; 
+            transform: translateY(-50%) translateX(15px);
+            opacity: 0;
+            visibility: hidden;
+            
+            /* Fondo sólido y oscuro (el "cuadro negro") */
+            background-color: var(--background-dark); 
+            color: var(--text-light);
+
+            padding: 12px;
+            border-radius: 8px;
+            max-width: 250px; 
+            width: max-content; 
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.9);
+            border: 2px solid var(--secondary-color);
+            pointer-events: none;
+            transition: opacity 0.3s, visibility 0.3s, transform 0.3s;
+            z-index: 50;
+            font-size: 0.875rem; 
+            line-height: 1.4; 
+        }
+
+        /* Tooltip a la izquierda para elementos muy a la derecha */
+        .pin-tooltip.left {
+            left: auto;
+            right: 100%;
+            transform: translateY(-50%) translateX(-15px);
+        }
+
+        .map-pin:hover .pin-tooltip {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Utilidad para dar espacio debajo de la barra de navegación fija */
+        .navbar-spacer {
+            height: 4.5rem;
+            width: 100%;
+            display: block;
+        }
+        
+        /* Estilos del Carrusel */
+        .carousel-item {
+            display: none;
+            opacity: 0; /* Inicialmente oculto */
+            transition: opacity 0.5s ease-in-out;
+        }
+
+        .carousel-item.active {
+            display: block;
+            opacity: 1;
+        }
+        
+        /* Estilos para centrar el horario */
+        .centered-schedule .flex {
+            justify-content: center;
+            text-align: center;
+        }
+        .centered-schedule .flex > span {
+            text-align: center;
+        }
+        
+        /* Estilos para el tooltip de donación */
+        .donate-tooltip {
+            position: absolute;
+            bottom: -100%; /* Inicialmente debajo */
+            left: 50%;
+            transform: translateX(-50%) translateY(10px);
+            opacity: 0;
+            visibility: hidden;
+            background-color: var(--background-dark);
+            color: var(--primary-color);
+            padding: 8px 12px;
+            border-radius: 6px;
+            white-space: nowrap;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--primary-color);
+            pointer-events: none;
+            transition: opacity 0.3s, visibility 0.3s, transform 0.3s;
+            z-index: 60;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        
+        /* Mostrar el tooltip al hacer hover en el botón de donar */
+        .donate-button-wrapper:hover .donate-tooltip {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(0); /* Sube un poco */
+        }
+
+        /* === ESTILOS PARA EL BOTÓN 'SOY NUEVO' (AZUL) === */
+        
+        .btn-welcome {
+            background-color: var(--welcome-btn-color); /* Fondo AZUL Profundo */
+            color: var(--background-dark); /* Texto Oscuro */
+            box-shadow: 0 4px 15px var(--welcome-btn-color, #1E88E5); /* Sombra AZUL */
+            box-shadow: 0 4px 15px rgba(30, 136, 229, 0.6); /* Sombra de Azúl */
+            transition: all 0.3s;
+        }
+
+        .btn-welcome:hover {
+            background-color: var(--welcome-btn-hover); /* Azul más claro al hacer hover */
+            box-shadow: 0 6px 20px rgba(30, 136, 229, 0.8);
+        }
+        
+        /* Estilos para el Modal General */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /* Z-index: 100 para el primer modal, 110 para el segundo */
+            z-index: 100; 
+            backdrop-filter: blur(5px);
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+        /* Elevando el segundo modal */
+        #connect-card-modal {
+            z-index: 110; 
+        }
+
+        .modal.open {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background-color: var(--background-light);
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            border-radius: 1rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.9);
+            transform: scale(0.9);
+            transition: transform 0.3s ease-out;
+            padding: 2rem;
+            /* Borde del modal de bienvenida usando el color primario */
+            border: 3px solid var(--primary-color);
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* Borde específico para el modal de conexión (mantenido en primary) */
+        #connect-card-modal .modal-content {
+             border: 3px solid var(--primary-color); 
+        }
+
+
+        .modal.open .modal-content {
+            transform: scale(1);
+        }
+
+        /* Estilos del Formulario de Conexión */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .form-label {
+            display: block;
+            font-weight: 500;
+            color: var(--text-light);
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+        .form-input, .form-select {
+            width: 100%;
+            padding: 0.75rem;
+            background-color: var(--background-dark);
+            border: 1px solid var(--background-light);
+            border-radius: 0.5rem;
+            color: var(--text-light);
+            transition: border-color 0.3s;
+        }
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.5); /* Sombra de enfoque verde */
+        }
+        .required-star {
+            color: var(--primary-color);
+            margin-left: 0.25rem;
+        }
+
+        /* Estilos para Radio Buttons y Checkboxes (Mejor usabilidad) */
+        .radio-option, .checkbox-option {
+            display: flex;
+            align-items: center;
+            margin-top: 0.5rem;
+        }
+        .radio-option input[type="radio"], .checkbox-option input[type="checkbox"] {
+            margin-right: 0.75rem;
+            width: 1.25rem;
+            height: 1.25rem;
+            accent-color: var(--primary-color);
+            cursor: pointer;
+        }
+        
+    </style>
+
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "var(--primary-color)",
+                        secondary: "var(--secondary-color)",
+                        "background-dark": "var(--background-dark)",
+                        "background-light": "var(--background-light)",
+                        "text-light": "var(--text-light)",
+                        "text-dark": "var(--text-dark)",
+                        "purple-welcome": "var(--purple-welcome)",
+                    },
+                    fontFamily: {
+                        display: ["Inter", "sans-serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "0.375rem",
+                        lg: "0.5rem",
+                        xl: "0.75rem",
+                        '2xl': '1rem',
+                        '3xl': '1.5rem',
+                        '4xl': '2rem',
+                        full: "9999px",
+                    },
+                },
+            },
+        };
+
+        // --- SCRIPTS ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // 1. Script para el efecto de hover de los pines (MAPA)
+            const pins = document.querySelectorAll('.map-pin');
+            pins.forEach(pin => {
+                pin.addEventListener('mouseenter', () => {
+                    pin.classList.remove('pin-default');
+                    pin.classList.add('pin-hover-state');
+                });
+                pin.addEventListener('mouseleave', () => {
+                    pin.classList.remove('pin-hover-state');
+                    pin.classList.add('pin-default');
+                });
+            });
+
+            // 2. Script para el Carrusel de Fotos
+            const maxPhotos = 300; 
+            const imageExtension = 'jpg'; 
+            const carouselInner = document.getElementById('carousel-inner');
+            const prevButton = document.getElementById('prev-slide');
+            const nextButton = document.getElementById('next-slide');
+
+            let currentSlide = 0;
+            let slides = [];
+            let totalSlides = 0;
+            
+            // Función para actualizar las referencias del carrusel y la visibilidad de los botones
+            function updateSlidesAndControls() {
+                slides = document.querySelectorAll('#carousel-inner .carousel-item');
+                totalSlides = slides.length;
+                // CORRECCIÓN: Mostrar/Ocultar flechas basadas en el número de fotos
+                if (totalSlides > 1) {
+                    prevButton.style.display = 'block';
+                    nextButton.style.display = 'block';
+                } else {
+                    prevButton.style.display = 'none';
+                    nextButton.style.display = 'none';
+                }
+            }
+            
+            // Recopilar solo las URLs de imágenes que existen
+            const validImageUrls = [];
+            for (let i = 1; i <= maxPhotos; i++) {
+                const imgPath = `foto${i}.${imageExtension}`;
+                const img = new Image();
+                img.onload = () => {
+                    // Si la imagen carga, la agregamos al carrusel
+                    const div = document.createElement('div');
+                    div.classList.add('carousel-item', 'w-full', 'h-full');
+                    div.innerHTML = `<img src="${imgPath}" alt="Foto ${i}" class="w-full h-full object-cover rounded-xl transition duration-500 ease-in-out">`;
+                    carouselInner.appendChild(div);
+                    
+                    // Solo si es la primera imagen, la activamos
+                    if (carouselInner.children.length === 1) {
+                        div.classList.add('active');
+                    }
+                    
+                    // Actualizar la referencia de diapositivas
+                    updateSlidesAndControls();
+                    
+                    // Si la imagen cargada es la primera, inicia el auto-avance
+                    if (carouselInner.children.length === 1 && totalSlides <= 1) {
+                        // Iniciar el temporizador solo si hay más de 1 slide después de la carga
+                        if (totalSlides > 1) {
+                             setInterval(nextSlide, 5000);
+                        }
+                    }
+                };
+                img.onerror = () => {
+                    // console.log(`Error al cargar foto${i}`); // Descomentar para debug de fotos
+                };
+                img.src = imgPath;
+            }
+
+            
+            // Llamada inicial para ocultar si no hay fotos
+            updateSlidesAndControls(); 
+
+            // Función para mostrar la diapositiva
+            function showSlide(index) {
+                if (totalSlides === 0) return;
+                slides.forEach(slide => slide.classList.remove('active'));
+                
+                currentSlide = (index + totalSlides) % totalSlides;
+                slides[currentSlide].classList.add('active');
+            }
+
+            // Funciones de navegación con flechas
+            function nextSlide() {
+                showSlide(currentSlide + 1);
+            }
+
+            function prevSlide() {
+                showSlide(currentSlide - 1);
+            }
+
+            // CORRECCIÓN: Agregar listeners a los botones de flecha
+            if (prevButton) prevButton.addEventListener('click', prevSlide);
+            if (nextButton) nextButton.addEventListener('click', nextSlide);
+
+            // Temporizador para avance automático (se inicia después de cargar la primera foto en el bucle de carga)
+            let autoAdvanceInterval = null;
+            function startAutoAdvance() {
+                if (totalSlides > 1 && !autoAdvanceInterval) {
+                     autoAdvanceInterval = setInterval(nextSlide, 5000);
+                }
+            }
+            // Se debe llamar después de que se hayan cargado todas las fotos o al detectar que hay más de una.
+            // Para fines de este script dinámico, se deja el inicio en el `img.onload` para la primera carga.
+            
+            // 3. Script para el Menú Hamburguesa
+            function toggleMenu() {
+                const menu = document.getElementById('mobile-menu');
+                const button = document.getElementById('menu-button');
+                const isOpen = menu.classList.toggle('hidden');
+                
+                if (isOpen) {
+                    // Muestra el icono de barras
+                    button.innerHTML = '<i class="fas fa-bars"></i>';
+                } else {
+                    // Muestra el icono de X
+                    button.innerHTML = '<i class="fas fa-times"></i>';
+                }
+            }
+            window.toggleMenu = toggleMenu; 
+
+            // 4. Script para los Modales (Soy Nuevo y Tarjeta de Conexión) - LÓGICA ANIDADA
+            const welcomeModal = document.getElementById('welcome-modal');
+            const connectCardModal = document.getElementById('connect-card-modal');
+            const openWelcomeButton = document.getElementById('btn-soy-nuevo');
+            const welcomeToConnectButton = document.getElementById('btn-welcome-to-connect');
+            
+            // Botones de Cierre
+            const closeWelcomeBtn = document.getElementById('modal-welcome-close-btn');
+            const closeConnectBtn = document.getElementById('modal-connect-close-btn');
+            
+            // Funciones de control
+            function openModal(modal) {
+                modal.classList.add('open');
+                document.body.style.overflow = 'hidden'; 
+            }
+
+            function closeModal(modal) {
+                modal.classList.remove('open');
+                // Solo restaurar el scroll si NO hay otros modales abiertos
+                if (!welcomeModal.classList.contains('open') && !connectCardModal.classList.contains('open')) {
+                    document.body.style.overflow = '';
+                }
+            }
+
+            // Event Listeners para el Modal de Bienvenida (el primero)
+            if (openWelcomeButton) openWelcomeButton.addEventListener('click', () => openModal(welcomeModal));
+            
+            // Cierre del Modal de Bienvenida
+            if (closeWelcomeBtn) closeWelcomeBtn.addEventListener('click', () => closeModal(welcomeModal));
+            if (welcomeModal) {
+                welcomeModal.addEventListener('click', (e) => {
+                    if (e.target === welcomeModal) {
+                        closeModal(welcomeModal);
+                    }
+                });
+            }
+            
+            // TRANSICIÓN: Botón "Nos encantaría conocerte"
+            if (welcomeToConnectButton) {
+                welcomeToConnectButton.addEventListener('click', (e) => {
+                    e.preventDefault(); // Evita cualquier acción por defecto del botón/enlace
+                    closeModal(welcomeModal); // 1. Cierra el modal de bienvenida
+                    openModal(connectCardModal); // 2. Abre el modal de la tarjeta de conexión
+                });
+            }
+
+            // Event Listeners para el Modal de Tarjeta de Conexión (el segundo)
+            
+            // Cierre del Modal de Tarjeta de Conexión
+            if (closeConnectBtn) closeConnectBtn.addEventListener('click', () => closeModal(connectCardModal));
+            if (connectCardModal) {
+                connectCardModal.addEventListener('click', (e) => {
+                    if (e.target === connectCardModal) {
+                        closeModal(connectCardModal);
+                    }
+                });
+            }
+            
+            // Exportar openModal para usarlo en el menú móvil
+            window.openModal = (modalId) => {
+                const modal = document.getElementById(modalId);
+                if (modal) {
+                    openModal(modal);
+                }
+            };
+        });
+    </script>
+    
+</head>
+
+<body class="font-display text-text-light bg-background-dark">
+    
+    <div id="connect-card-modal" class="modal">
+        <div class="modal-content text-text-light relative p-6 md:p-10">
+            <button id="modal-connect-close-btn" class="absolute top-4 right-4 text-3xl text-text-dark hover:text-primary transition-colors">
+                <i class="fas fa-times"></i>
+            </button>
+
+            <h1 class="text-3xl font-black text-primary mb-2">
+                Tarjeta de Conexión Digital
+            </h1>
+            <p class="text-text-dark mb-6 border-b border-background-dark pb-4">
+                Complete el formulario a continuación para que sepamos cuál es la mejor manera de mantenerlo actualizado.
+            </p>
+
+            <form id="connect-card-form" class="space-y-6" action="https://formspree.io/f/mgvnbjyn" method="POST">
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="form-group">
+                        <label for="nombre" class="form-label">Su nombre <span class="required-star">*</span></label>
+                        <input type="text" id="nombre" name="nombre" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="apellido" class="form-label">Apellido</label>
+                        <input type="text" id="apellido" name="apellido" class="form-input">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="form-group">
+                        <label for="email" class="form-label">Dirección de correo electrónico <span class="required-star">*</span></label>
+                        <input type="email" id="email" name="email" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="telefono" class="form-label">Número de teléfono <span class="required-star">*</span></label>
+                        <input type="tel" id="telefono" name="telefono" class="form-input" required>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="form-group">
+                        <label class="form-label">Tu información <span class="required-star">*</span></label>
+                        <div class="space-y-2">
+                            <label class="radio-option">
+                                <input type="radio" name="info_tipo" value="Soy nuevo" required>
+                                <span>Soy nuevo.</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="info_tipo" value="Mi información ha cambiado">
+                                <span>Mi información ha cambiado.</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="info_tipo" value="Soy un asistente sólo en línea">
+                                <span>Soy un asistente sólo en línea.</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Tipo de teléfono</label>
+                        <div class="space-y-2">
+                            <label class="radio-option">
+                                <input type="radio" name="phone_type" value="Móvil">
+                                <span>Móvil</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="phone_type" value="Hogar">
+                                <span>Hogar</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="phone_type" value="Trabajar">
+                                <span>Trabajar</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="phone_type" value="Otro">
+                                <span>Otro</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <h3 class="text-xl font-bold text-primary border-b border-background-dark pb-2 mt-6">DIRECCIÓN <span class="required-star">*</span></h3>
+                <div class="form-group">
+                    <label class="form-label">Tipo de dirección</label>
+                    <div class="space-x-4 flex">
+                        <label class="radio-option">
+                            <input type="radio" name="address_type" value="Hogar" required>
+                            <span>Hogar</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="address_type" value="Trabajar">
+                            <span>Trabajar</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="address_type" value="Otro">
+                            <span>Otro</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="form-group">
+                        <label for="country" class="form-label">País</label>
+                        <select id="country" name="country" class="form-select">
+                            <option value="">Seleccionar País...</option>
+                            <option value="Afganistán">1. Afganistán</option>
+                            <option value="Albania">2. Albania</option>
+                            <option value="Alemania">3. Alemania</option>
+                            <option value="Andorra">4. Andorra</option>
+                            <option value="Angola">5. Angola</option>
+                            <option value="Antigua y Barbuda">6. Antigua y Barbuda</option>
+                            <option value="Arabia Saudita">7. Arabia Saudita</option>
+                            <option value="Argelia">8. Argelia</option>
+                            <option value="Argentina">9. Argentina</option>
+                            <option value="Armenia">10. Armenia</option>
+                            <option value="Australia">11. Australia</option>
+                            <option value="Austria">12. Austria</option>
+                            <option value="Azerbaiyán">13. Azerbaiyán</option>
+                            <option value="Bahamas">14. Bahamas</option>
+                            <option value="Bangladés">15. Bangladés</option>
+                            <option value="Barbados">16. Barbados</option>
+                            <option value="Baréin">17. Baréin</option>
+                            <option value="Bélgica">18. Bélgica</option>
+                            <option value="Belice">19. Belice</option>
+                            <option value="Benín">20. Benín</option>
+                            <option value="Bielorrusia">21. Bielorrusia</option>
+                            <option value="Birmania">22. Birmania</option>
+                            <option value="Bolivia">23. Bolivia</option>
+                            <option value="Bosnia y Herzegovina">24. Bosnia y Herzegovina</option>
+                            <option value="Botsuana">25. Botsuana</option>
+                            <option value="Brasil">26. Brasil</option>
+                            <option value="Brunéi">27. Brunéi</option>
+                            <option value="Bulgaria">28. Bulgaria</option>
+                            <option value="Burkina Faso">29. Burkina Faso</option>
+                            <option value="Burundi">30. Burundi</undi>
+                            <option value="Bután">31. Bután</option>
+                            <option value="Cabo Verde">32. Cabo Verde</option>
+                            <option value="Camboya">33. Camboya</option>
+                            <option value="Camerún">34. Camerún</option>
+                            <option value="Canadá">35. Canadá</option>
+                            <option value="Catar">36. Catar</option>
+                            <option value="Chad">37. Chad</option>
+                            <option value="Chile">38. Chile</option>
+                            <option value="China">39. China</option>
+                            <option value="Chipre">40. Chipre</option>
+                            <option value="Ciudad del Vaticano">41. Ciudad del Vaticano</option>
+                            <option value="Colombia">42. Colombia</option>
+                            <option value="Comoras">43. Comoras</option>
+                            <option value="Corea del Norte">44. Corea del Norte</option>
+                            <option value="Corea del Sur">45. Corea del Sur</option>
+                            <option value="Costa de Marfil">46. Costa de Marfil</option>
+                            <option value="Costa Rica">47. Costa Rica</option>
+                            <option value="Croacia">48. Croacia</option>
+                            <option value="Cuba">49. Cuba</option>
+                            <option value="Dinamarca">50. Dinamarca</option>
+                            <option value="Dominica">51. Dominica</option>
+                            <option value="Ecuador">52. Ecuador</option>
+                            <option value="Egipto">53. Egipto</option>
+                            <option value="El Salvador">54. El Salvador</option>
+                            <option value="Emiratos Árabes Unidos">55. Emiratos Árabes Unidos</option>
+                            <option value="Eritrea">56. Eritrea</option>
+                            <option value="Eslovaquia">57. Eslovaquia</option>
+                            <option value="Eslovenia">58. Eslovenia</option>
+                            <option value="España">59. España</option>
+                            <option value="Estados Unidos">60. Estados Unidos</option>
+                            <option value="Estonia">61. Estonia</option>
+                            <option value="Etiopía">62. Etiopía</option>
+                            <option value="Filipinas">63. Filipinas</option>
+                            <option value="Finlandia">64. Finlandia</option>
+                            <option value="Fiyi">65. Fiyi</option>
+                            <option value="Francia">66. Francia</option>
+                            <option value="Gabón">67. Gabón</option>
+                            <option value="Gambia">68. Gambia</option>
+                            <option value="Georgia">69. Georgia</option>
+                            <option value="Ghana">70. Ghana</option>
+                            <option value="Granada">71. Granada</option>
+                            <option value="Grecia">72. Grecia</option>
+                            <option value="Guatemala">73. Guatemala</option>
+                            <option value="Guyana">74. Guyana</option>
+                            <option value="Guinea">75. Guinea</option>
+                            <option value="Guinea Ecuatorial">76. Guinea Ecuatorial</option>
+                            <option value="Guinea-Bisáu">77. Guinea-Bisáu</option>
+                            <option value="Haití">78. Haití</option>
+                            <option value="Honduras">79. Honduras</option>
+                            <option value="Hungría">80. Hungría</option>
+                            <option value="India">81. India</option>
+                            <option value="Indonesia">82. Indonesia</option>
+                            <option value="Irak">83. Irak</option>
+                            <option value="Irán">84. Irán</option>
+                            <option value="Irlanda">85. Irlanda</option>
+                            <option value="Islandia">86. Islandia</option>
+                            <option value="Islas Marshall">87. Islas Marshall</option>
+                            <option value="Islas Salomón">88. Islas Salomón</option>
+                            <option value="Israel">89. Israel</option>
+                            <option value="Italia">90. Italia</option>
+                            <option value="Jamaica">91. Jamaica</option>
+                            <option value="Japón">92. Japón</option>
+                            <option value="Jordania">93. Jordania</option>
+                            <option value="Kazajistán">94. Kazajistán</option>
+                            <option value="Kenia">95. Kenia</option>
+                            <option value="Kirguistán">96. Kirguistán</option>
+                            <option value="Kiribati">97. Kiribati</option>
+                            <option value="Kuwait">98. Kuwait</option>
+                            <option value="Laos">99. Laos</option>
+                            <option value="Lesoto">100. Lesoto</option>
+                            <option value="Letonia">101. Letonia</option>
+                            <option value="Líbano">102. Líbano</option>
+                            <option value="Liberia">103. Liberia</option>
+                            </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="street" class="form-label">Dirección de la calle</label>
+                        <input type="text" id="street" name="street" class="form-input">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="apt" class="form-label">Apartamento/unidad/caja (opcional)</label>
+                    <input type="text" id="apt" name="apt" class="form-input">
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="form-group">
+                        <label for="city" class="form-label">Ciudad</label>
+                        <input type="text" id="city" name="city" class="form-input">
+                    </div>
+                    <div class="form-group">
+                        <label for="state" class="form-label">Estado</label>
+                        <input type="text" id="state" name="state" class="form-input">
+                    </div>
+                    <div class="form-group">
+                        <label for="zip" class="form-label">Código Postal</label>
+                        <input type="text" id="zip" name="zip" class="form-input">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="form-group">
+                        <label for="gender" class="form-label">Género <span class="required-star">*</span></label>
+                        <select id="gender" name="gender" class="form-select" required>
+                            <option value="">Seleccionar…</option>
+                            <option value="masculino">Masculino</option>
+                            <option value="femenino">Femenino</option>
+                            <option value="no_decir">Prefiero no decir</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="dob" class="form-label">Fecha de nacimiento <span class="required-star">*</span></label>
+                        <input type="date" id="dob" name="dob" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="marital_status" class="form-label">Estado civil</label>
+                        <select id="marital_status" name="marital_status" class="form-select">
+                            <option value="">Seleccionar…</option>
+                            <option value="soltero">Soltero</option>
+                            <option value="casado">Casado</option>
+                            <option value="viudo">Viudo</option>
+                            <option value="apartado">Apartado</option>
+                            <option value="divorciado">Divorciado</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group border-t border-background-dark pt-4">
+                    <label class="form-label">¿Has entregado tu vida a Jesús?</label>
+                    <select id="faith_decision" name="faith_decision" class="form-select">
+                        <option value="">Seleccionar…</option>
+                        <option value="¡Sí, he entregado mi vida a Cristo!">¡Sí, he entregado mi vida a Cristo!</option>
+                        <option value="Todavía no, pero me encantaría hablar con un pastor.">Todavía no, pero me encantaría hablar con un pastor.</option>
+                    </select>
+                </div>
+                
+                <div class="form-group border-t border-background-dark pt-4">
+                    <label class="form-label">¿Cómo podemos servirle? <span class="required-star">*</span></label>
+                    <div class="space-y-2">
+                        <label class="checkbox-option">
+                            <input type="checkbox" name="servicio[]" value="Interesado en asistir a las clases de membresía de Next Step">
+                            <span>Estoy interesado en asistir a las clases de membresía de Next Step.</span>
+                        </label>
+                        <label class="checkbox-option">
+                            <input type="checkbox" name="servicio[]" value="Interesado en ser bautizado">
+                            <span>Estoy interesado en ser bautizado.</span>
+                        </label>
+                        <label class="checkbox-option">
+                            <input type="checkbox" name="servicio[]" value="Interesado en unirme a un Grupo de Vida">
+                            <span>Estoy interesado en unirme a un Grupo de Vida.</span>
+                        </label>
+                        <label class="checkbox-option">
+                            <input type="checkbox" name="servicio[]" value="Otro">
+                            <span>Otro</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="text-center pt-4">
+                    <p class="text-text-dark text-xs mb-3">
+                        Este sitio está protegido por reCAPTCHA y se aplican las políticas de privacidad de Google. 
+                        <a href="URL_POLITICA_PRIVACIDAD" target="_blank" class="text-primary hover:text-secondary underline">política de privacidad</a> y 
+                        <a href="URL_CONDICIONES_SERVICIO" target="_blank" class="text-primary hover:text-secondary underline">Condiciones de servicio</a> aplicar.
+                    </p>
+                    <button type="submit" class="bg-primary text-background-dark font-bold px-8 py-3 rounded-lg shadow-lg hover:bg-secondary transition-colors text-lg">
+                        Entregar
+                    </button>
+                </div>
+            </form>
+            
+        </div>
+    </div>
+    <div id="welcome-modal" class="modal">
+        <div class="modal-content text-text-light p-6 md:p-10 relative">
+            <button id="modal-welcome-close-btn" class="absolute top-4 right-4 text-3xl text-text-dark hover:text-primary transition-colors">
+                <i class="fas fa-times"></i>
+            </button>
+
+            <h1 class="text-4xl font-black text-primary mb-4 border-b-2 border-primary pb-2">
+                ¡Bienvenido a Casa de Refugio!
+            </h1>
+
+            <p class="text-xl font-bold text-text-light mb-4">
+                ¡Estamos muy felices de que estés aquí!
+            </p>
+            
+            <p class="text-text-dark mb-6 leading-relaxed">
+                Ya sea que sea nuevo en el área de Columbia, Lexington, Irmo o Chapin, simplemente esté de visita o quiera unirse a la iglesia como miembro oficial, **¡estamos emocionados de que esté aquí!**
+            </p>
+            <div class="relative w-full overflow-hidden mb-8 rounded-lg shadow-xl">
+                <div style="padding-top: 56.25%;"> 
+                    <iframe 
+                        class="absolute top-0 left-0 w-full h-full"
+                        src="https://www.youtube.com/embed/SU_VIDEO_ID_AQUI" 
+                        title="Video de Bienvenida" 
+                        frameborder="0" 
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                        allowfullscreen
+                    ></iframe>
+                </div>
+            </div>
+            <div class="bg-background-dark p-4 rounded-lg border-l-4 border-secondary mb-8">
+                <button id="btn-welcome-to-connect" class="text-xl font-bold text-primary mb-2 hover:underline focus:outline-none block w-full text-left">
+                    ¡NOS ENCANTARÍA CONOCERTE!
+                </button>
+                <p class="text-text-dark">
+                    Haz click aquí para llenar tu **tarjeta de conexión digital** y recibir un **REGALO GRATIS** cuando nos visites en persona.
+                </p>
+            </div>
+            <h2 class="text-2xl font-bold text-text-light mb-3 flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary">book</span>
+                Recursos para el Crecimiento
+            </h2>
+            <p class="text-text-dark mb-6">
+                Si eres un cristiano nuevo o simplemente quieres profundizar tu fe, consulta nuestra
+                <a href="#" class="text-secondary hover:text-primary underline font-medium">lista confiable y completa</a> de libros recomendados, videos y más para ayudarte en tu viaje de fe.
+            </p>
+
+            <h2 class="text-2xl font-bold text-text-light mb-4 flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary">schedule</span>
+                Nuestros Horarios de Adoración
+            </h2>
+            
+            <div class="space-y-4">
+                <div class="bg-background-dark p-4 rounded-lg border-l-4 border-primary">
+                    <p class="font-bold text-lg text-primary">Servicios Principales</p>
+                    <p class="text-text-light mt-1">
+                        <span class="font-bold">Domingos:</span> 9:00 am + 11:00 am | Santuario
+                    </p>
+                    <p class="text-text-dark text-sm mt-1">
+                        ¿No puedes asistir en persona? <a href="#live-stream" onclick="closeModal(welcomeModal)" class="text-secondary hover:text-primary underline">Únete a nuestra transmisión en vivo</a> los domingos a las 11:00 a. m.
+                    </p>
+                    <p class="text-text-light mt-1">
+                        <span class="font-bold">Miércoles:</span> Ver <a href="#noticias" onclick="closeModal(welcomeModal)" class="text-secondary hover:text-primary underline">eventos</a> para servicios especiales durante todo el año.
+                    </p>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-background-dark p-4 rounded-lg border-l-4 border-secondary">
+                        <p class="font-bold text-lg text-secondary">Ministerio de Niños</p>
+                        <p class="text-text-light mt-1">
+                            <span class="font-bold">Domingos 9:00 a. m. y 11:00 a. m.:</span> KidzLife Jr. (0-4 años) y KidzLife (K5-5.º grado)
+                        </p>
+                        <p class="text-text-light mt-1">
+                            <span class="font-bold">Miércoles 7:00 pm:</span> KnownKidz (otoño de 2025)
+                        </p>
+                    </div>
+
+                    <div class="bg-background-dark p-4 rounded-lg border-l-4 border-secondary">
+                        <p class="font-bold text-lg text-secondary">Ministerio de la Juventud de la Unión</p>
+                        <p class="text-text-light mt-1">
+                            <span class="font-bold">Miércoles 7:00 pm:</span> Escuela Secundaria y Preparatoria | Capilla Brown
+                        </p>
+                    </div>
+
+                    <div class="bg-background-dark p-4 rounded-lg border-l-4 border-secondary">
+                        <p class="font-bold text-lg text-secondary">Clásicos para Adultos Mayores</p>
+                        <p class="text-text-light mt-1">
+                            <span class="font-bold">Jueves 11:00 am:</span> Personas mayores de 55 años | Capilla Brown
+                        </p>
+                        <p class="text-text-dark text-sm mt-1 italic">
+                            ¡Únase a nosotros para un almuerzo gratis el cuarto jueves de cada mes!
+                        </p>
+                    </div>
+
+                    <div class="bg-background-dark p-4 rounded-lg border-l-4 border-secondary">
+                        <p class="font-bold text-lg text-secondary">CREW Jóvenes Adultos</p>
+                        <p class="text-text-light mt-1">
+                            <span class="font-bold">Segundo y cuarto martes de cada mes, 18:30 h:</span> Edades: 18-30 años | Capilla Brown
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <h2 class="text-3xl font-black text-primary mt-8 mb-4">
+                PRÓXIMOS PASOS
+            </h2>
+            <p class="text-text-dark mb-4">
+                Estamos contigo sin importar dónde estés. **¡Bienvenido a la familia!**
+            </p>
+            
+            <p class="text-text-dark mb-6">
+                Si desea obtener más información sobre nuestra iglesia, complete el formulario de inscripción a la clase Next Step a continuación para cada persona que asista. Nuestras clases Next Step se imparten los domingos por la mañana en febrero y septiembre de cada año.
+            </p>
+
+            <a href="#" onclick="alert('Aquí iría el formulario de inscripción a la clase Next Step.'); return false;" class="inline-flex items-center justify-center rounded-lg h-12 px-6 bg-primary text-background-dark gap-2 text-base font-bold shadow-lg shadow-primary/40 hover:shadow-xl hover:scale-[1.02] transition-all">
+                QUIERO APRENDER MÁS SOBRE LA IGLESIA.
+            </a>
+            
+        </div>
+    </div>
+    <nav class="fixed-navbar shadow-2xl">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-18">
+                <a href="#inicio" class="flex-shrink-0 flex items-center gap-2">
+                    <img class="h-10 w-auto" src="black logo.png" alt="Ha Resucitado Logo">
+                    <span class="text-xl font-black text-text-light hidden sm:block">CASA DE REFUGIO</span>
+                </a>
+
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="#live-stream" class="text-text-dark hover:bg-background-dark hover:text-primary px-3 py-2 rounded-lg font-medium transition-colors">En Vivo</a>
+                        <a href="#galeria" class="text-text-dark hover:bg-background-dark hover:text-primary px-3 py-2 rounded-lg font-medium transition-colors">Galería</a>
+                        <a href="#horario" class="text-text-dark hover:bg-background-dark hover:text-primary px-3 py-2 rounded-lg font-medium transition-colors">Horario</a>
+                        <a href="#misiones" class="text-text-dark hover:bg-background-dark hover:text-primary px-3 py-2 rounded-lg font-medium transition-colors">Misiones</a>
+                        <a href="#contacto" class="text-text-dark hover:bg-background-dark hover:text-primary px-3 py-2 rounded-lg font-medium transition-colors">Contacto</a>
+                        
+                        <button id="btn-soy-nuevo" class="btn-welcome text-background-dark font-bold px-4 py-2 rounded-lg shadow-lg hover:shadow-xl transition-colors text-sm">
+                            SOY NUEVO
+                        </button>
+                        
+                        <div class="relative inline-block donate-button-wrapper">
+                            <a href="https://www.zellepay.com" target="_blank" class="bg-primary text-background-dark font-bold px-4 py-2 rounded-lg shadow-md hover:bg-secondary transition-colors text-sm">DONAR</a>
+                            <span class="donate-tooltip">
+                                Zelle: 803-922-5417<br/>Leonardo Osoy
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="-mr-2 flex md:hidden">
+                    <button type="button" id="menu-button" onclick="toggleMenu()"
+                        class="bg-background-dark inline-flex items-center justify-center p-2 rounded-lg text-primary hover:text-secondary hover:bg-background-dark focus:outline-none transition-colors"
+                        aria-controls="mobile-menu" aria-expanded="false">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="md:hidden hidden absolute w-full bg-background-light shadow-xl border-t border-background-dark" id="mobile-menu">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="#live-stream" onclick="toggleMenu()" class="text-text-light hover:bg-background-dark block px-3 py-2 rounded-md text-base font-medium">En Vivo</a>
+                <a href="#galeria" onclick="toggleMenu()" class="text-text-light hover:bg-background-dark block px-3 py-2 rounded-md text-base font-medium">Galería</a>
+                <a href="#horario" onclick="toggleMenu()" class="text-text-light hover:bg-background-dark block px-3 py-2 rounded-md text-base font-medium">Horario</a>
+                <a href="#misiones" onclick="toggleMenu()" class="text-text-light hover:bg-background-dark block px-3 py-2 rounded-md text-base font-medium">Misiones</a>
+                <a href="#contacto" onclick="toggleMenu()" class="text-text-light hover:bg-background-dark block px-3 py-2 rounded-md text-base font-medium">Contacto</a>
+                
+                <button onclick="openModal('welcome-modal'); toggleMenu();" class="btn-welcome text-background-dark font-bold block w-full text-center px-4 py-2 mt-4 rounded-lg shadow-md hover:shadow-xl transition-colors text-sm">
+                    SOY NUEVO
+                </button>
+                
+                <a href="https://www.zellepay.com" target="_blank" onclick="alert('Zelle para donar: 803-922-5417 (Leonardo Osoy)'); toggleMenu();" class="bg-primary text-background-dark font-bold block w-full text-center px-4 py-2 mt-4 rounded-lg shadow-md hover:bg-secondary transition-colors text-sm">DONAR (Info Zelle)</a>
+            </div>
+        </div>
+    </nav>
+    <div id="video-background-container" class="fixed top-0 left-0 w-full h-full overflow-hidden">
+        <video autoplay loop muted playsinline id="video-background" class="w-full h-full absolute opacity-10">
+            <source src="mifondo.mp4" type="video/mp4">
+            Tu navegador no soporta el elemento de video.
+        </video>
+    </div>
+    
+    <div class="relative flex min-h-screen w-full flex-col overflow-x-hidden">
+        
+        <div class="navbar-spacer" id="inicio"></div>
+
+        <main class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8 space-y-12 relative z-20">
+
+            <section id="galeria" class="bg-background-light p-8 rounded-xl shadow-2xl border-t-4 border-secondary backdrop-blur-sm">
+                <h2 class="text-3xl font-bold text-text-light mb-6 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary text-3xl">photo_library</span>
+                    Galería de Fotos
+                </h2>
+
+                <div class="relative w-full aspect-video md:aspect-[16/7] overflow-hidden rounded-xl shadow-2xl border-2 border-primary">
+                    <div id="carousel-inner" class="w-full h-full relative">
+                        </div>
+                    
+                    <button id="prev-slide" class="absolute top-1/2 left-4 transform -translate-y-1/2 bg-black/50 p-3 rounded-full text-text-light hover:bg-primary transition-colors" style="display: none;">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <button id="next-slide" class="absolute top-1/2 right-4 transform -translate-y-1/2 bg-black/50 p-3 rounded-full text-text-light hover:bg-primary transition-colors" style="display: none;">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+
+                    </div>
+            </section>
+            
+            <div id="portada-audio-recuadro" class="bg-background-light p-8 rounded-xl shadow-2xl border-t-4 border-primary backdrop-blur-sm">
+                <h2 class="text-3xl font-bold text-text-light mb-6 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-secondary text-3xl">mic</span>
+                    Nuestro Podcast y Radio
+                </h2>
+                <div class="w-full max-w-lg mx-auto overflow-hidden rounded-xl shadow-2xl border-2 border-primary">
+                    <img src="portadaaudio.jpg" alt="Portada de Audio Ha Resucitado" class="w-full object-cover">
+                </div>
+                <p class="text-text-dark text-center mt-4">
+                    Escucha el mensaje de **"Ha Resucitado"** en nuestra radio y en todas las plataformas de podcast.
+                </p>
+            </div>
+            <div id="live-stream" class="bg-background-light p-8 rounded-xl shadow-2xl border-t-4 border-primary backdrop-blur-sm">
+                <h2 class="text-3xl font-bold text-text-light mb-6 flex items-center gap-2">
+                    <span class="fab fa-twitch text-primary text-3xl"></span>
+                    Transmisión en Vivo
+                </h2>
+                <div class="aspect-w-16 aspect-h-9 w-full">
+                    <iframe 
+                        src="https://player.twitch.tv/?channel=radioharesucitado&parent=haresucitado.github.io&muted=false&autoplay=true" 
+                        height="500" 
+                        width="100%" 
+                        allowfullscreen="true" 
+                        scrolling="no" 
+                        frameborder="0"
+                        class="w-full rounded-lg shadow-xl border border-secondary"
+                    ></iframe>
+                </div>
+            </div>
+
+            <div class="flex flex-col lg:flex-row gap-12">
+                
+                <div class="lg:w-1/3">
+                    <div class="bg-background-light p-8 rounded-xl shadow-2xl border-t-4 border-primary/50 backdrop-blur-sm h-full">
+                        <h3 class="text-2xl font-bold text-primary mb-3 flex items-center gap-2">
+                            <span class="material-symbols-outlined text-secondary">mail</span>
+                            Información de Contacto
+                        </h3>
+                        <div class="text-text-dark space-y-3 text-base">
+                            <p class="flex items-start gap-2">
+                                <span class="material-symbols-outlined text-primary text-lg flex-shrink-0">location_on</span>
+                                <span class="font-bold">Dirección:</span> 1918 Augusta Rd, West Columbia,SC
+                            </p>
+                            <p class="flex items-center gap-2">
+                                <span class="material-symbols-outlined text-primary text-lg flex-shrink-0">phone</span>
+                                <span class="font-bold">Teléfono:</span> (803) 922-5417
+                            </p>
+                            <p class="flex items-center gap-2">
+                                <span class="material-symbols-outlined text-primary text-lg flex-shrink-0">email</span>
+                                <span class="font-bold">Email:</span> radioharesucitado@gmail.com
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="horario" class="lg:w-2/3 bg-background-light p-8 rounded-xl shadow-2xl border-t-4 border-primary/50 backdrop-blur-sm">
+                    <h2 class="text-3xl font-bold text-text-light mb-6 flex items-center gap-2 justify-center text-center">
+                        <span class="material-symbols-outlined text-primary text-3xl">schedule</span>
+                        Horario de Cultos y Podcast
+                    </h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-4 text-text-light max-w-xl mx-auto centered-schedule">
+                        <div class="flex justify-between items-center border-b border-background-dark py-2">
+                            <span class="font-medium">Lunes Podcast</span>
+                            <span class="text-primary font-bold">8:00 PM</span>
+                        </div>
+                        <div class="flex justify-between items-center border-b border-background-dark py-2">
+                            <span class="font-medium">Martes Oración</span>
+                            <span class="text-primary font-bold">8:00 PM</span>
+                        </div>
+                        <div class="flex justify-between items-center border-b border-background-dark py-2">
+                            <span class="font-medium">Miércoles Clase de Discipulado</span>
+                            <span class="text-primary font-bold">8:00 PM</span>
+                        </div>
+                        <div class="flex justify-between items-center border-b border-background-dark py-2">
+                            <span class="font-medium">Jueves Podcast</span>
+                            <span class="text-primary font-bold">8:00 PM</span>
+                        </div>
+                        <div class="flex justify-between items-center border-b border-background-dark py-2">
+                            <span class="font-medium">Viernes Culto</span>
+                            <span class="text-primary font-bold">8:00 PM</span>
+                        </div>
+                        <div class="flex justify-between items-center border-b border-background-dark py-2">
+                            <span class="font-medium">Sábado Podcast</span>
+                            <span class="text-primary font-bold">6:00 PM</span>
+                        </div>
+                        <div class="flex justify-between items-center py-2 col-span-1 md:col-span-2">
+                            <span class="font-medium">Domingo Culto (Mañana y Tarde)</span>
+                            <span class="text-primary font-bold">9 A 11 AM y 12:00 PM</span>
+                        </div>
+                    </div>
+                    <p class="text-secondary text-lg mt-6 text-center italic font-semibold">
+                        Te esperamos en la presencia de Dios. ¡Trae a un Amigo! 👋
+                    </p>
+                </div>
+            </div>
+
+            <div id="sobre-nosotros" class="bg-background-light p-8 rounded-xl shadow-2xl border-t-4 border-primary backdrop-blur-sm">
+                <h2 class="text-3xl font-bold text-text-light mb-4 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary">info</span>
+                    Sobre Nosotros
+                </h2>
+                <p class="text-text-dark leading-relaxed">
+                    Iglesia Casa de Refugio/Radio "Ha Resucitado" es un ministerio cristiano dedicado a la
+                    proclamación del evangelio de Jesucristo a través de la música, la
+                    enseñanza y la comunión. Nacimos en el corazón de Dios con el
+                    propósito de ser una luz de esperanza y un faro de fe para todas
+                    las naciones. Nuestra historia es un testimonio del poder
+                    transformador de Dios, comenzando como un pequeño proyecto de
+                    radio en línea y creciendo hasta convertirnos en una comunidad
+                    global de creyentes unidos por el amor de Cristo. Creemos en el
+                    poder de la Palabra y la adoración para cambiar vidas, restaurar
+                    corazones y construir el Reino de Dios aquí en la Tierra.
+                </p>
+            </div>
+            
+            <div id="ministerios" class="bg-background-light p-8 rounded-xl shadow-2xl border-t-4 border-primary/70 backdrop-blur-sm">
+                <h2 class="text-3xl font-bold text-text-light mb-6 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary">groups</span>
+                    Nuestros Ministerios
+                </h2>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-text-light">
+                    
+                    <a href="#URL_MINISTERIO_ALABANZA" class="block bg-background-dark p-3 rounded-lg flex items-center gap-2 shadow-md border-b-2 border-secondary hover:bg-secondary/20 transition-colors">
+                        <span class="material-symbols-outlined text-primary">music_note</span>
+                        <span class="text-sm font-medium">Ministerio de Alabanza</span>
+                    </a>
+                    <a href="#URL_MINISTERIO_JOVENES" class="block bg-background-dark p-3 rounded-lg flex items-center gap-2 shadow-md border-b-2 border-secondary hover:bg-secondary/20 transition-colors">
+                        <span class="material-symbols-outlined text-primary">face_6</span>
+                        <span class="text-sm font-medium">Ministerio de Jóvenes</span>
+                    </a>
+                    <a href="#URL_MINISTERIO_PREJOVENES" class="block bg-background-dark p-3 rounded-lg flex items-center gap-2 shadow-md border-b-2 border-secondary hover:bg-secondary/20 transition-colors">
+                        <span class="material-symbols-outlined text-primary">child_care</span>
+                        <span class="text-sm font-medium">Ministerio de Pre-Jóvenes</span>
+                    </a>
+                    <a href="#URL_MINISTERIO_CABALLEROS" class="block bg-background-dark p-3 rounded-lg flex items-center gap-2 shadow-md border-b-2 border-secondary hover:bg-secondary/20 transition-colors">
+                        <span class="material-symbols-outlined text-primary">man</span>
+                        <span class="text-sm font-medium">Ministerio de Caballeros</span>
+                    </a>
+                    <a href="#URL_MINISTERIO_DAMAS" class="block bg-background-dark p-3 rounded-lg flex items-center gap-2 shadow-md border-b-2 border-secondary hover:bg-secondary/20 transition-colors">
+                        <span class="material-symbols-outlined text-primary">woman</span>
+                        <span class="text-sm font-medium">Ministerio de Damas</span>
+                    </a>
+                    <a href="#URL_MINISTERIO_UJIERES" class="block bg-background-dark p-3 rounded-lg flex items-center gap-2 shadow-md border-b-2 border-secondary hover:bg-secondary/20 transition-colors">
+                        <span class="material-symbols-outlined text-primary">vpn_key</span>
+                        <span class="text-sm font-medium">Ministerio de Ujieres</span>
+                    </a>
+                    <a href="#URL_MINISTERIO_NINOS" class="block bg-background-dark p-3 rounded-lg flex items-center gap-2 shadow-md border-b-2 border-secondary hover:bg-secondary/20 transition-colors">
+                        <span class="material-symbols-outlined text-primary">school</span>
+                        <span class="text-sm font-medium">Ministerio de Niños</span>
+                    </a>
+                    <a href="#URL_MINISTERIO_EVANGELISMO" class="block bg-background-dark p-3 rounded-lg flex items-center gap-2 shadow-md border-b-2 border-secondary hover:bg-secondary/20 transition-colors">
+                        <span class="material-symbols-outlined text-primary">campaign</span>
+                        <span class="text-sm font-medium">Ministerio de Evangelismo</span>
+                    </a>
+                    </div>
+            </div>
+
+            <div id="misiones" class="bg-background-light p-8 rounded-xl shadow-2xl border-t-4 border-primary backdrop-blur-sm">
+                <h2 class="text-3xl font-bold text-text-light mb-4 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary">public</span>
+                    Nuestra Iglesia Alrededor del Mundo (Misiones)
+                </h2>
+                <p class="text-text-dark leading-relaxed mb-6 italic">
+                    Únase a nosotros en la misión de reconciliar al mundo con Cristo por medio del poder del Espíritu Santo. (Haga click en un pin para detalles e historia).
+                </p>
+
+                <div class="map-wrapper relative">
+                    <img src="mapa.png" alt="Mapa de Misiones de la Iglesia de Dios de la Profecía" class="map-image" />
+
+                    <a href="#URL_MISIONES_NORTEAMERICA" target="_blank"
+                        class="map-pin pin-default"
+                        style="top: 38.04%; left: 23.11%; transform: translate(-50%, -50%);"
+                    >
+                        <span class="pin-tooltip">
+                            <span class="font-bold block text-primary mb-1">Norteamérica</span>
+                            En Norteamérica, la Iglesia de Dios de la Profecía está viva y proclamando el evangelio en **cuatro naciones**. Contando con una membresía de **88,216 personas** adorando en **12 idiomas**.
+                        </span>
+                    </a>
+
+                    <a href="#URL_MISIONES_MEXICO_CENTROAMERICA" target="_blank"
+                        class="map-pin pin-default"
+                        style="top: 51.96%; left: 21.22%; transform: translate(-50%, -50%);"
+                    >
+                        <span class="pin-tooltip">
+                            <span class="font-bold block text-primary mb-1">México y Centroamérica</span>
+                            La Iglesia de Dios de la Profecía transforma vidas en **11 naciones** con **185,260 personas** que adoran en **tres idiomas**.
+                        </span>
+                    </a>
+
+                    <a href="#URL_MISIONES_ISLAS_CARIBE" target="_blank"
+                        class="map-pin pin-default"
+                        style="top: 50%; left: 28%; transform: translate(-50%, -50%);"
+                    >
+                        <span class="pin-tooltip">
+                            <span class="font-bold block text-primary mb-1">Islas del Caribe y Océano Atlántico</span>
+                            Con un alcance de **27 naciones**, más de **131,000 creyentes** alzan sus voces en **seis idiomas**, declarando la bondad de Dios.
+                        </span>
+                    </a>
+
+                    <a href="#URL_MISIONES_SUDAMERICA" target="_blank"
+                        class="map-pin pin-default"
+                        style="top: 69.41%; left: 30.05%; transform: translate(-50%, -50%);"
+                    >
+                        <span class="pin-tooltip">
+                            <span class="font-bold block text-primary mb-1">Sudamérica</span>
+                            La iglesia comparte la luz de Cristo en **10 naciones** con **83,467 miembros** que adoran en **cinco idiomas**.
+                        </span>
+                    </a>
+
+                    <a href="#URL_MISIONES_EURASIA" target="_blank"
+                        class="map-pin pin-default"
+                        style="top: 35.92%; left: 50.12%; transform: translate(-50%, -50%);"
+                    >
+                        <span class="pin-tooltip left">
+                            <span class="font-bold block text-primary mb-1">Europa y Eurasia</span>
+                            La Iglesia de Dios de la Profecía está presente en **24 naciones**. Con **16,408 personas** adorando en **19 idiomas**.
+                        </span>
+                    </a>
+
+                    <a href="#URL_MISIONES_AFRICA" target="_blank"
+                        class="map-pin pin-default"
+                        style="top: 54.71%; left: 52.20%; transform: translate(-50%, -50%);"
+                    >
+                        <span class="pin-tooltip left">
+                            <span class="font-bold block text-primary mb-1">África</span>
+                            A lo largo del vasto y diverso continente africano, la Iglesia de Dios de la Profecía es el faro de fe que alumbra en **39 naciones**.
+                        </span>
+                    </a>
+
+                    <a href="#URL_MISIONES_ASIA_OCEANIA" target="_blank"
+                        class="map-pin pin-default"
+                        style="top: 51.34%; left: 74.30%; transform: translate(-50%, -50%);"
+                    >
+                        <span class="pin-tooltip left">
+                            <span class="font-bold block text-primary mb-1">Asia, Australia y Oceanía</span>
+                            Una región impresionante con **53,328 miembros** que adoran en **29 idiomas**, unidos por su pasión por Cristo.
+                        </span>
+                    </a>
+
+                </div>
+                <p class="text-text-dark text-sm mt-4 text-center">
+                    Posiciona el ratón sobre los puntos para ver el impacto misionero de la iglesia. Haga click para ver detalles e historia.
+                </p>
+            </div>
+
+            <div id="noticias" class="bg-background-light p-8 rounded-xl shadow-2xl border-t-4 border-primary backdrop-blur-sm">
+                <h2 class="text-3xl font-bold text-text-light mb-4 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary">campaign</span>
+                    Noticias Recientes
+                </h2>
+                <div
+                    class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+                >
+                    <div
+                        class="bg-background-dark rounded-xl overflow-hidden shadow-lg group transition-transform hover:scale-[1.02] duration-300 border border-background-light hover:border-secondary"
+                    >
+                        <a href="https://www.facebook.com/watch?v=1501766384490245" target="_blank">
+                            <div
+                                class="w-full h-40 bg-cover bg-center transition-transform duration-300 group-hover:scale-105"
+                                style='background-image: url("IMAGEN_NOTICIA_1.jpg");'
+                            ></div>
+                            <div class="p-5">
+                                <p class="text-secondary text-sm font-medium">EVENTO</p>
+                                <p
+                                    class="text-text-light text-lg font-bold mt-1 group-hover:text-primary transition-colors"
+                                >
+                                    Gran Campaña de Milagros
+                                </p>
+                                <p class="text-text-dark text-sm mt-2">
+                                    Revive los momentos de fe y sanidad en nuestra última campaña.
+                                </p>
+                            </div>
+                        </a>
+                    </div>
+                    <div
+                        class="bg-background-dark rounded-xl overflow-hidden shadow-lg group transition-transform hover:scale-[1.02] duration-300 border border-background-light hover:border-secondary"
+                    >
+                        <a href="URL_DEL_ANUNCIO_2" target="_blank">
+                            <div
+                                class="w-full h-40 bg-cover bg-center transition-transform duration-300 group-hover:scale-105"
+                                style='background-image: url("IMAGEN_NOTICIA_2.jpg");'
+                            ></div>
+                            <div class="p-5">
+                                <p class="text-secondary text-sm font-medium">PASTORAL</p>
+                                <p
+                                    class="text-text-light text-lg font-bold mt-1 group-hover:text-primary transition-colors"
+                                >
+                                    Lanzamiento de la nueva Serie
+                                </p>
+                                <p class="text-text-dark text-sm mt-2">
+                                    Una poderosa enseñanza bíblica sobre el poder de la resurrección.
+                                </p>
+                            </div>
+                        </a>
+                    </div>
+                    <div
+                        class="bg-background-dark rounded-xl overflow-hidden shadow-lg group transition-transform hover:scale-[1.02] duration-300 border border-background-light hover:border-secondary"
+                    >
+                        <a href="URL_DEL_ANUNCIO_3" target="_blank">
+                            <div
+                                class="w-full h-40 bg-cover bg-center transition-transform duration-300 group-hover:scale-105"
+                                style='background-image: url("IMAGEN_NOTICIA_3.jpg")'
+                            ></div>
+                            <div class="p-5">
+                                <p class="text-secondary text-sm font-medium">RADIO</p>
+                                <p
+                                    class="text-text-light text-lg font-bold mt-1 group-hover:text-primary transition-colors"
+                                >
+                                    Nuevos Podcast de Oración
+                                </p>
+                                <p class="text-text-dark text-sm mt-2">
+                                    Escucha mensajes de aliento en tu plataforma de podcast favorita.
+                                </p>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div id="contacto" class="bg-background-light/90 p-8 rounded-xl shadow-2xl text-center backdrop-blur-sm border-t-4 border-primary">
+                <h2 class="text-3xl font-bold text-text-light">
+                    Síguenos
+                </h2>
+                <p class="text-text-dark mt-2 mb-6 max-w-lg mx-auto">
+                    Mantente conectado con nosotros, participa en nuestras
+                    conversaciones y sé parte de nuestra comunidad en línea.
+                </p>
+                <div class="flex justify-center items-center gap-6 mb-8">
+                    <a
+                        class="text-primary hover:text-secondary transition-colors text-4xl"
+                        href="https://www.facebook.com/profile.php?id=61580656551288"
+                        target="_blank"
+                        title="Síguenos en Facebook"
+                        ><i class="fab fa-facebook-f"></i
+                    ></a>
+                    
+                    <a
+                        class="text-primary hover:text-secondary transition-colors text-4xl"
+                        href="https://www.twitch.tv/[TU_NOMBRE_DE_CANAL_DE_TWITCH]"
+                        target="_blank"
+                        title="Síguenos en Twitch"
+                        ><i class="fab fa-twitch"></i
+                    ></a>
+                    
+                    <a
+                        class="text-primary hover:text-secondary transition-colors text-4xl"
+                        href="URL_DE_INSTAGRAM"
+                        target="_blank"
+                        title="Síguenos en Instagram"
+                        ><i class="fab fa-instagram"></i
+                    ></a>
+                    
+                    <a
+                        class="text-primary hover:text-secondary transition-colors text-4xl"
+                        href="https://www.youtube.com/@radio-ha-resucitado"
+                        target="_blank"
+                        title="Suscríbete en YouTube"
+                        ><i class="fab fa-youtube"></i
+                    ></a>
+                    
+                    <a
+                        class="text-primary hover:text-secondary transition-colors text-4xl"
+                        href="URL_DE_TIKTOK"
+                        target="_blank"
+                        title="Síguenos en TikTok"
+                        ><i class="fab fa-tiktok"></i
+                    ></a>
+                </div>
+                <a
+                    class="inline-flex items-center justify-center rounded-lg h-12 px-6 bg-primary text-background-dark gap-2 text-base font-bold shadow-lg shadow-primary/40 hover:shadow-xl hover:scale-[1.02] transition-all"
+                    href="https://wa.me/18039225417?text=Hola%20Radio%20Ha%20Resucitado%2C%20quisiera%20pedir%20una%20oraci%C3%B3n%20o%20hacer%20una%20consulta."
+                    target="_blank"
+                >
+                    <i class="fab fa-whatsapp"></i>
+                    <span>Envíanos un WhatsApp</span>
+                </a>
+            </div>
+        </main>
+
+        <footer class="bg-background-light/90 border-t border-background-dark mt-12 z-20 backdrop-blur-sm">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <div
+                    class="flex flex-col md:flex-row justify-between items-start gap-8"
+                >
+
+                    <div class="flex flex-col gap-3">
+                        <span class="text-text-dark text-sm"
+                            >© 2025 Ha Resucitado Radio. Todos los derechos reservados.</span
+                        >
+                        <span class="text-text-dark text-xs">
+                            Desarrollado por <span class="text-primary font-bold">Leonardo. O</span>.
+                        </span>
+                        
+                        <div class="flex items-center gap-3 mt-4">
+                            <a href="https://www.facebook.com/IDDDLP" title="Logo de la Iglesia Casa de Refugio">
+                                <img src="logo iglesia.png" alt="Logo de la Iglesia de Dios de la Profecía" class="h-10 w-auto">
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-8 md:gap-12">
+                        <div>
+                            <h4 class="font-bold text-text-light mb-2 flex items-center gap-2">
+                                <span class="material-symbols-outlined text-primary">church</span>
+                                Iglesia Casa de Refugio
+                            </h4>
+                            <p class="text-text-dark text-sm">
+                                <span class="font-bold">1918 Augusta Rd</span>
+                                <br>
+                                West Columbia, SC
+                                <br>
+                                United States
+                            </p>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-text-light mb-2 flex items-center gap-2">
+                                <span class="material-symbols-outlined text-primary">radio</span>
+                                Estudios de Radio
+                            </h4>
+                            <p class="text-text-dark text-sm">
+                                <span class="font-bold">1918 Augusta Rd</span>
+                                <br>
+                                West Columbia, SC
+                                <br>
+                                United States
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </footer>
+        <div
+            class="w-full h-2 bg-primary shadow-xl shadow-primary/40"
+        ></div>
+    </div>
+<script>
+    // --- Configuración de la Galería ---
+    const NUMERO_DE_FOTOS = 6; // <--- **AJUSTE ESTE NÚMERO** (Cuántas fotos tiene en total)
+    const NOMBRE_BASE_IMAGEN = 'galeria_';
+    const EXTENSION_IMAGEN = '.jpg';
+    const CARPETA_IMAGENES = 'imagenes/';
+    // -----------------------------------
+
+    const carouselInner = document.getElementById('carousel-inner');
+    const prevButton = document.getElementById('prev-slide');
+    const nextButton = document.getElementById('next-slide');
+    let currentSlide = 0;
+    let slides = [];
+    let intervalId;
+
+    // Función para crear e inyectar las diapositivas (fotos)
+    function initializeCarousel() {
+        for (let i = 1; i <= NUMERO_DE_FOTOS; i++) {
+            const slide = document.createElement('div');
+            slide.className = 'absolute top-0 left-0 w-full h-full transition-opacity duration-700 ease-in-out';
+            slide.style.opacity = '0'; // Inicialmente invisibles
+            slide.style.zIndex = '10';
+            
+            // Crea la imagen
+            const img = document.createElement('img');
+            img.src = `${CARPETA_IMAGENES}${NOMBRE_BASE_IMAGEN}${i}${EXTENSION_IMAGEN}`;
+            img.alt = `Foto de la galería ${i}`;
+            img.className = 'w-full h-full object-cover';
+            img.loading = 'lazy';
+            
+            slide.appendChild(img);
+            carouselInner.appendChild(slide);
+            slides.push(slide);
+        }
+
+        if (slides.length > 0) {
+            slides[0].style.opacity = '1'; // Muestra la primera foto
+            slides[0].style.zIndex = '20';
+            prevButton.style.display = 'block';
+            nextButton.style.display = 'block';
+            startAutoplay(); // Inicia el carrusel automático
+        } else {
+            carouselInner.innerHTML = '<div class="flex items-center justify-center h-full text-text-dark text-xl">No hay fotos en la galería.</div>';
+        }
+    }
+
+    // Función para cambiar de diapositiva
+    function showSlide(index) {
+        // Ocultar todas las diapositivas
+        slides.forEach(slide => {
+            slide.style.opacity = '0';
+            slide.style.zIndex = '10';
+        });
+
+        // Asegurar que el índice esté dentro de los límites
+        currentSlide = (index + slides.length) % slides.length;
+
+        // Mostrar la diapositiva actual
+        slides[currentSlide].style.opacity = '1';
+        slides[currentSlide].style.zIndex = '20';
+    }
+
+    // Navegación (botones)
+    function nextSlide() {
+        showSlide(currentSlide + 1);
+    }
+    
+    function prevSlide() {
+        showSlide(currentSlide - 1);
+    }
+
+    // Autoplay
+    function startAutoplay() {
+        if (intervalId) clearInterval(intervalId); // Limpia cualquier intervalo anterior
+        intervalId = setInterval(nextSlide, 5000); // Cambia cada 5 segundos (5000 milisegundos)
+    }
+
+    // Eventos de botones
+    nextButton.addEventListener('click', () => {
+        nextSlide();
+        startAutoplay(); // Reinicia el contador de autoplay al hacer click
+    });
+
+    prevButton.addEventListener('click', () => {
+        prevSlide();
+        startAutoplay(); // Reinicia el contador de autoplay al hacer click
+    });
+
+    // Iniciar el carrusel cuando la página cargue
+    window.addEventListener('load', initializeCarousel);
+</script>
+</body>
+</html>
