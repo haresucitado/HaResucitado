@@ -6,7 +6,7 @@ const PRECACHE_ASSETS = [
   '/index.html',
   '/512-icon.png',
   '/192-icon.png',
-  '/32x32-icon.png.png'
+  '/32x32-icon.png'
 ];
 
 self.addEventListener('install', (event) => {
@@ -47,5 +47,6 @@ self.addEventListener('fetch', (event) => {
     )
   );
 });
+
 
 
