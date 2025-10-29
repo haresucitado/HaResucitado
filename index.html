@@ -1984,49 +1984,66 @@
     display: none;
     align-items: center;
     gap: 10px;
-    padding: 10px 14px;
-    border-radius: 9999px;
-    background: linear-gradient(180deg, #4CAF50, #3d9643);
-    color: #07120b;
-    font-weight: 700;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+    padding: 10px 18px;
+    border-radius: 50px;
+    background: linear-gradient(90deg, #00c853, #43a047);
+    color: white;
+    font-weight: 600;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+    border: 2px solid rgba(255, 255, 255, 0.15);
     cursor: pointer;
-    font-size: 15px;
-    border: none;
+    font-size: 16px;
+    transition: all 0.3s ease;
   }
+
+  #install-button:hover {
+    transform: scale(1.06);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.45);
+  }
+
   #install-button img {
-    width: 34px;
-    height: 34px;
-    border-radius: 8px;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
     object-fit: cover;
+    border: 2px solid rgba(255, 255, 255, 0.4);
   }
+
   #install-ios-hint {
     position: fixed;
     left: 16px;
     bottom: 80px;
     z-index: 85;
     display: none;
-    max-width: 260px;
-    background: rgba(26,26,26,0.95);
+    max-width: 280px;
+    background: rgba(30, 30, 30, 0.95);
     color: #fff;
-    border: 2px solid rgba(76,175,80,0.9);
-    padding: 12px;
-    border-radius: 8px;
+    border: 2px solid #43a047;
+    padding: 12px 14px;
+    border-radius: 10px;
     font-size: 14px;
+    line-height: 1.4;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  }
+
+  @media (max-width: 480px) {
+    #install-button span {
+      font-size: 15px;
+    }
   }
 </style>
 
-<button id="install-button" aria-label="Instalar App">
-  <img src="/icon512.png"" alt="Icono App">
-  <span>Instalar</span>
+<button id="install-button" aria-label="Instalar App Radio Ha Resucitado">
+  <img src="/icon512.png" alt="Radio Ha Resucitado">
+  <span>Instalar App</span>
 </button>
 
 <div id="install-ios-hint">
-  En el Celular: Compartir → Más →Añadir a pantalla de inicio
-  
+  📲 En iPhone: toca <strong>Compartir</strong> → <strong>Agregar a pantalla de inicio</strong>.
 </div>
 
 <script>
+  // Registro del service worker
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/service-worker.js').catch(console.warn);
   }
@@ -2048,7 +2065,7 @@
     installBtn.style.display = 'inline-flex';
     installBtn.addEventListener('click', () => {
       iosHint.style.display = 'block';
-      setTimeout(() => iosHint.style.display = 'none', 6000);
+      setTimeout(() => (iosHint.style.display = 'none'), 7000);
     });
   }
 
@@ -2068,6 +2085,7 @@
 </body>
 
 </html>
+
 
 
 
