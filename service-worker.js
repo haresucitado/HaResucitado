@@ -1,4 +1,4 @@
-const CACHE_NAME = 'haresucitado';
+const CACHE_NAME = 'Radio Ha Resucitado';
 const OFFLINE_URL = '/index.html';
 
 const PRECACHE_ASSETS = [
@@ -49,6 +49,7 @@ self.addEventListener('fetch', (event) => {
     )
   );
 });
+
 
 
 
