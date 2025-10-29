@@ -1,4 +1,4 @@
-const CACHE_NAME = 'haresucitado-cache-v1';
+const CACHE_NAME = 'haresucitado';
 const OFFLINE_URL = '/index.html';
 
 const PRECACHE_ASSETS = [
@@ -47,3 +47,4 @@ self.addEventListener('fetch', (event) => {
     )
   );
 });
+
